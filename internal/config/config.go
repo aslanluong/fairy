@@ -1,57 +1,52 @@
-package main
+package config
 
 import (
-	"fairy/internal/events"
 	"fmt"
-	"io/ioutil"
 	"os"
-	"os/signal"
 	"strconv"
-	"syscall"
 
-	"github.com/bwmarrin/discordgo"
 	"gopkg.in/yaml.v2"
 )
 
-func main() {
-	LoadEnvVars()
-
-	discord, err := discordgo.New("Bot " + os.Getenv("bot.token"))
-	if err != nil {
-		fmt.Println("error creating discord session, ", err)
-		return
-	}
-	defer discord.Close()
-
-	discord.AddHandler(events.MessageCreate)
-
-	err = discord.Open()
-	if err != nil {
-		fmt.Println("error opening connection, ", err)
-	}
-
-	fmt.Println("Bot is now running...")
-	stop := make(chan os.Signal, 1)
-	signal.Notify(stop, syscall.SIGTERM)
-	<-stop
+type Keys struct {
+	Bot     Bot
+	Mongodb Mongodb
 }
 
-func LoadEnvVars() {
-	env, err := ioutil.ReadFile("./env.yml")
+type Bot struct {
+	Token  string
+	Prefix string
+}
+
+type Mongodb struct {
+	Uri string
+}
+
+var EnvKeys = Keys{
+	Bot: Bot{
+		Token:  "bot.token",
+		Prefix: "bot.prefix",
+	},
+	Mongodb: Mongodb{
+		Uri: "mongodb.uri",
+	}}
+
+func LoadConfigsToEnv() (err error) {
+	env, err := os.ReadFile("./env.yml")
 	if err != nil {
 		return
 	}
 
 	var envVars map[string]interface{}
 	if err := yaml.Unmarshal(env, &envVars); err != nil {
-		fmt.Println("fail", err)
+		fmt.Println("error unmarshalling env vars,", err)
 	} else {
 		var setEnvVars func(rootKey string, values map[string]interface{})
 		setEnvVars = func(rootKey string, values map[string]interface{}) {
 			for key, value := range values {
 				_, ok := value.(map[interface{}]interface{})
 				if ok {
-					valuesMarshal, _ := yaml.Marshal(value)
+					valuesMarshal, _ := yaml.Marshal(&value)
 					var valuesUnmarshal map[string]interface{}
 					yaml.Unmarshal(valuesMarshal, &valuesUnmarshal)
 					setEnvVars(rootKey+key+".", valuesUnmarshal)
@@ -67,4 +62,11 @@ func LoadEnvVars() {
 		}
 		setEnvVars("", envVars)
 	}
+	return
+
+}
+
+func GetValue(key string) (value string) {
+	value = os.Getenv(key)
+	return
 }

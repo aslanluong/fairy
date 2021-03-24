@@ -1,4 +1,4 @@
-module fairy
+module github.com/aslanluong/fairy
 
 go 1.16
 
