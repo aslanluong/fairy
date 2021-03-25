@@ -29,7 +29,8 @@ var EnvKeys = Keys{
 	},
 	Mongodb: Mongodb{
 		Uri: "mongodb.uri",
-	}}
+	},
+}
 
 func LoadConfigsToEnv() (err error) {
 	env, err := os.ReadFile("./env.yml")
@@ -62,11 +63,5 @@ func LoadConfigsToEnv() (err error) {
 		}
 		setEnvVars("", envVars)
 	}
-	return
-
-}
-
-func GetValue(key string) (value string) {
-	value = os.Getenv(key)
 	return
 }

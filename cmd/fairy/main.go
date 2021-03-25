@@ -18,16 +18,16 @@ func main() {
 		fmt.Println("Using existing environment variables")
 	}
 
-	discord, err := discordgo.New("Bot " + os.Getenv(config.EnvKeys.Bot.Token))
+	session, err := discordgo.New("Bot " + os.Getenv(config.EnvKeys.Bot.Token))
 	if err != nil {
 		fmt.Println("error creating discord session, ", err)
 		return
 	}
-	defer discord.Close()
+	defer session.Close()
 
-	discord.AddHandler(events.MessageCreate)
+	registerEvents(session)
 
-	err = discord.Open()
+	err = session.Open()
 	if err != nil {
 		fmt.Println("error opening connection, ", err)
 	}
@@ -36,4 +36,8 @@ func main() {
 	stop := make(chan os.Signal, 1)
 	signal.Notify(stop, syscall.SIGTERM)
 	<-stop
+}
+
+func registerEvents(s *discordgo.Session) {
+	s.AddHandler(events.Ready)
 }
