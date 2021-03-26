@@ -1,8 +1,6 @@
-package events
+package listeners
 
 import (
-	"fmt"
-
 	"github.com/bwmarrin/discordgo"
 )
 
@@ -10,5 +8,5 @@ func MessageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 	if m.Author.ID == s.State.User.ID {
 		return
 	}
-	fmt.Println("chat")
+	s.ChannelMessageSend(m.ChannelID, "pong")
 }

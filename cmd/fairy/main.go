@@ -7,7 +7,7 @@ import (
 	"syscall"
 
 	"github.com/aslanluong/fairy/internal/config"
-	"github.com/aslanluong/fairy/internal/events"
+	"github.com/aslanluong/fairy/internal/listeners"
 	"github.com/bwmarrin/discordgo"
 )
 
@@ -39,5 +39,5 @@ func main() {
 }
 
 func registerEvents(s *discordgo.Session) {
-	s.AddHandler(events.Ready)
+	s.AddHandler(listeners.NewReadyListener().Handler)
 }

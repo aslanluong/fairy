@@ -1,4 +1,4 @@
-package events
+package listeners
 
 import "github.com/bwmarrin/discordgo"
 
