@@ -40,4 +40,6 @@ func main() {
 
 func registerEvents(s *discordgo.Session) {
 	s.AddHandler(listeners.NewReadyListener().Handler)
+	s.AddHandler(listeners.NewMemberAddListener().Handler)
+	s.AddHandler(listeners.NewMemberRemoveListener().Handler)
 }
