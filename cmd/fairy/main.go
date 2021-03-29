@@ -6,6 +6,7 @@ import (
 	"os/signal"
 	"syscall"
 
+	"github.com/aslanluong/fairy/internal/commands"
 	"github.com/aslanluong/fairy/internal/config"
 	"github.com/aslanluong/fairy/internal/listeners"
 	"github.com/bwmarrin/discordgo"
@@ -26,6 +27,7 @@ func main() {
 	defer session.Close()
 
 	registerEvents(session)
+	registerCommands(session, os.Getenv(config.EnvKeys.Bot.Prefix))
 
 	err = session.Open()
 	if err != nil {
@@ -42,4 +44,12 @@ func registerEvents(s *discordgo.Session) {
 	s.AddHandler(listeners.NewReadyListener().Handler)
 	s.AddHandler(listeners.NewMemberAddListener().Handler)
 	s.AddHandler(listeners.NewMemberRemoveListener().Handler)
+}
+
+func registerCommands(s *discordgo.Session, prefix string) {
+	cmdHandler := commands.NewCommandHandler(prefix)
+
+	cmdHandler.RegisterCommand(&commands.CmdPing{})
+
+	s.AddHandler(cmdHandler.HandleMessage)
 }
