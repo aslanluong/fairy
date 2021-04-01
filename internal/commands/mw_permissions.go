@@ -11,6 +11,12 @@ func (mw *MwPermissions) Exec(ctx *Context, cmd Command) (next bool, err error) 
 		return
 	}
 
+	defer func() {
+		if !next && err == nil {
+			_, err = ctx.Session.ChannelMessage(ctx.Message.ChannelID, "Permission denied!")
+		}
+	}()
+
 	guild, err := ctx.Session.Guild(ctx.Message.GuildID)
 	if err != nil {
 		return

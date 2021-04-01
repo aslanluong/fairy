@@ -48,8 +48,12 @@ func registerEvents(s *discordgo.Session) {
 
 func registerCommands(s *discordgo.Session, prefix string) {
 	cmdHandler := commands.NewCommandHandler(prefix)
+	cmdHandler.OnError = func(err error, ctx *commands.Context) {
+		fmt.Printf("Command execution failed: %s\n", err.Error())
+	}
 
 	cmdHandler.RegisterCommand(&commands.CmdPing{})
+	cmdHandler.RegisterMiddleware(&commands.MwPermissions{})
 
 	s.AddHandler(cmdHandler.HandleMessage)
 }
