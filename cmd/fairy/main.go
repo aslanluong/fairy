@@ -53,6 +53,8 @@ func registerCommands(s *discordgo.Session, prefix string) {
 	}
 
 	cmdHandler.RegisterCommand(&commands.CmdPing{})
+	cmdHandler.RegisterCommand(&commands.CmdSay{})
+
 	cmdHandler.RegisterMiddleware(&commands.MwPermissions{})
 
 	s.AddHandler(cmdHandler.HandleMessage)
