@@ -2,6 +2,7 @@ package commands
 
 import (
 	"strconv"
+	"time"
 )
 
 type CmdClear struct {
@@ -23,7 +24,12 @@ func (c *CmdClear) Exec(ctx *Context) (err error) {
 	args := ctx.Args
 
 	limit, err := strconv.Atoi(args[0])
-	if err != nil {
+	if err != nil || limit < 1 || limit > 100 {
+		if message, fail := ctx.Session.ChannelMessageSendReply(ctx.Message.ChannelID, "Invalid amount (1-100), please try again!", ctx.Message.Reference()); fail == nil {
+			time.AfterFunc(3*time.Second, func() {
+				ctx.Session.ChannelMessageDelete(ctx.Message.ChannelID, message.ID)
+			})
+		}
 		return
 	}
 
