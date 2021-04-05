@@ -1,6 +1,7 @@
 package commands
 
 import (
+	"fmt"
 	"strconv"
 	"time"
 )
@@ -33,7 +34,7 @@ func (c *CmdClear) Exec(ctx *Context) (err error) {
 		return
 	}
 
-	messages, err := ctx.Session.ChannelMessages(ctx.Message.ChannelID, limit, "", "", "")
+	messages, err := ctx.Session.ChannelMessages(ctx.Message.ChannelID, limit, ctx.Message.ID, "", "")
 	if err != nil {
 		return
 	}
@@ -43,6 +44,21 @@ func (c *CmdClear) Exec(ctx *Context) (err error) {
 		msgIds = append(msgIds, message.ID)
 	}
 	err = ctx.Session.ChannelMessagesBulkDelete(ctx.Message.ChannelID, msgIds)
+	if err != nil {
+		return
+	}
 
+	notiContent := "I've cleared that message."
+	if limit > 1 {
+		notiContent = fmt.Sprintf("I've cleared %d messages.", limit)
+	}
+	noti, err := ctx.Session.ChannelMessageSend(ctx.Message.ChannelID, notiContent)
+	if err != nil {
+		return
+	}
+
+	time.AfterFunc(3*time.Second, func() {
+		err = ctx.Session.ChannelMessagesBulkDelete(ctx.Message.ChannelID, []string{ctx.Message.ID, noti.ID})
+	})
 	return
 }
