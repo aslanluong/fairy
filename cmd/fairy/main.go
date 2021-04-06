@@ -52,6 +52,7 @@ func registerCommands(s *discordgo.Session, prefix string) {
 		fmt.Printf("Command execution failed: %s\n", err.Error())
 	}
 
+	cmdHandler.RegisterCommand(&commands.CmdHelp{})
 	cmdHandler.RegisterCommand(&commands.CmdPing{})
 	cmdHandler.RegisterCommand(&commands.CmdSay{})
 	cmdHandler.RegisterCommand(&commands.CmdClear{})
