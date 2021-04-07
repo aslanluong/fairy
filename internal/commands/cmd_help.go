@@ -2,6 +2,8 @@ package commands
 
 import (
 	"time"
+
+	"github.com/aslanluong/fairy/internal/utils"
 )
 
 type CmdHelp struct {
@@ -22,16 +24,14 @@ func (c *CmdHelp) AdminRequired() bool {
 func (c *CmdHelp) Exec(ctx *Context) (err error) {
 	args := ctx.Args
 
-	cmd := ctx.Handler.cmdMap[args[0]]
-	if cmd == nil {
-		if message, fail := ctx.Session.ChannelMessageSendReply(ctx.Message.ChannelID, "Invalid command name, please try again!", ctx.Message.Reference()); fail == nil {
-			time.AfterFunc(3*time.Second, func() {
-				ctx.Session.ChannelMessageDelete(ctx.Message.ChannelID, message.ID)
-			})
+	cmd, ok := ctx.Handler.cmdMap[args[0]]
+	if !ok {
+		if msg, fail := utils.SendMessageReply(ctx.Session, ctx.Message.Reference(), "Invalid command name, please try again!"); fail == nil {
+			msg.DeleteAfter(3 * time.Second)
 		}
 		return
 	}
 
-	_, err = ctx.Session.ChannelMessageSend(ctx.Message.ChannelID, cmd.Description())
+	_, err = utils.SendMessage(ctx.Session, ctx.Message.ChannelID, cmd.Description())
 	return
 }
