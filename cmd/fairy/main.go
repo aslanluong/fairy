@@ -44,6 +44,8 @@ func registerEvents(s *discordgo.Session) {
 	s.AddHandler(listeners.NewReadyListener().Handler)
 	s.AddHandler(listeners.NewMemberAddListener().Handler)
 	s.AddHandler(listeners.NewMemberRemoveListener().Handler)
+
+	s.AddHandler(listeners.CounterChannel().Handler)
 }
 
 func registerCommands(s *discordgo.Session, prefix string) {
@@ -56,6 +58,7 @@ func registerCommands(s *discordgo.Session, prefix string) {
 	cmdHandler.RegisterCommand(&commands.CmdPing{})
 	cmdHandler.RegisterCommand(&commands.CmdSay{})
 	cmdHandler.RegisterCommand(&commands.CmdClear{})
+	cmdHandler.RegisterCommand(&commands.CmdCounter{})
 
 	cmdHandler.RegisterMiddleware(&commands.MwPermissions{})
 

@@ -27,7 +27,7 @@ func (c *CmdHelp) Exec(ctx *Context) (err error) {
 	cmd, ok := ctx.Handler.cmdMap[args[0]]
 	if !ok {
 		if msg, fail := utils.SendMessageReply(ctx.Session, ctx.Message.Reference(), "Invalid command name, please try again!"); fail == nil {
-			msg.DeleteAfter(3 * time.Second)
+			msg.WaitAndDelete(3 * time.Second)
 		}
 		return
 	}

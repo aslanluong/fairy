@@ -18,13 +18,27 @@ func SendMessage(s *discordgo.Session, channelID string, content string) (*Messa
 }
 
 func SendMessageReply(s *discordgo.Session, reference *discordgo.MessageReference, content string) (*Message, error) {
-	msg, err := s.ChannelMessageSendReply(reference.ChannelID, "Invalid command name, please try again!", reference)
+	msg, err := s.ChannelMessageSendReply(reference.ChannelID, content, reference)
 	return &Message{msg, s}, err
 }
 
-func (msg *Message) DeleteAfter(d time.Duration) (err error) {
+func DeleteMessage(s *discordgo.Session, channelID string, messageID string) (err error) {
+	err = s.ChannelMessageDelete(channelID, messageID)
+	return
+}
+
+func DeleteMessageAfter(s *discordgo.Session, channelID string, messageID string, d time.Duration, callback func()) (err error) {
 	time.AfterFunc(d, func() {
-		err = msg.session.ChannelMessageDelete(msg.ChannelID, msg.ID)
+		err = s.ChannelMessageDelete(channelID, messageID)
+		if callback != nil {
+			callback()
+		}
 	})
+	return
+}
+
+func (msg *Message) WaitAndDelete(d time.Duration) (err error) {
+	time.Sleep(d)
+	err = msg.session.ChannelMessageDelete(msg.ChannelID, msg.ID)
 	return
 }
