@@ -1,6 +1,8 @@
 package commands
 
 import (
+	"errors"
+	"flag"
 	"strings"
 )
 
@@ -22,13 +24,19 @@ func (c *CmdSay) AdminRequired() bool {
 func (c *CmdSay) Exec(ctx *Context) (err error) {
 	args := ctx.Args
 
-	if args[len(args)-1] != "-hide" {
-		_, err = ctx.Session.ChannelMessageSend(ctx.Message.ChannelID, strings.Join(args, " "))
+	f := flag.NewFlagSet("sayflags", flag.ContinueOnError)
+	fHide := f.Bool("hide", false, "hide original message")
+	if err = f.Parse(args); err != nil {
+		return errors.New("invalid flag(s) provided")
+	}
+
+	if !*fHide {
+		_, err = ctx.Session.ChannelMessageSend(ctx.Message.ChannelID, strings.Join(f.Args(), " "))
 		return
 	}
 
 	if err = ctx.Session.ChannelMessageDelete(ctx.Message.ChannelID, ctx.Message.ID); err == nil {
-		_, err = ctx.Session.ChannelMessageSend(ctx.Message.ChannelID, strings.Join(args[:len(args)-1], " "))
+		_, err = ctx.Session.ChannelMessageSend(ctx.Message.ChannelID, strings.Join(f.Args(), " "))
 	}
 	return
 }
