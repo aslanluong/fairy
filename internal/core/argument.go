@@ -17,3 +17,21 @@ func (a Argument) AsBool() (bool, error) {
 }
 
 type ArgumentList []Argument
+
+func (al ArgumentList) Get(index int) Argument {
+	if index < 0 || index >= len(al) {
+		return Argument("")
+	}
+
+	return Argument(al[index])
+}
+
+func (al ArgumentList) IndexOf(value string) int {
+	for i, arg := range al {
+		if Argument(value) == arg {
+			return i
+		}
+	}
+
+	return -1
+}
