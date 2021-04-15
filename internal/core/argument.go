@@ -35,3 +35,20 @@ func (al ArgumentList) IndexOf(value string) int {
 
 	return -1
 }
+
+func (al ArgumentList) Contains(value string) bool {
+	return al.IndexOf(value) > -1
+}
+
+func (al ArgumentList) Splice(index, deleteCount int) ArgumentList {
+	l := len(al)
+	if index >= l {
+		return al
+	}
+
+	if index+deleteCount >= l {
+		return al[:index]
+	}
+
+	return append(al[:index], al[index+deleteCount:]...)
+}
