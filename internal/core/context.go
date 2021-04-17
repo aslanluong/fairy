@@ -15,3 +15,7 @@ type Context struct {
 func (ctx *Context) SendMessage(content string) {
 	utils.SendMessage(ctx.Session, ctx.Channel.ID, content)
 }
+
+func (ctx *Context) SendMessageReply(content string) {
+	utils.SendMessageReply(ctx.Session, ctx.Message.Reference(), content)
+}
