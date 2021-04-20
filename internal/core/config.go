@@ -22,10 +22,18 @@ type Mongodb struct {
 
 type YAMLConfigParser struct{}
 
-func (y *YAMLConfigParser) Encode(r io.Reader) (cfg *Config, err error) {
+func (y *YAMLConfigParser) Decode(r io.Reader) (cfg *Config, err error) {
 	decoder := yaml.NewDecoder(r)
 	cfg = new(Config)
 	err = decoder.Decode(cfg)
+	return
+}
+
+func (y *YAMLConfigParser) Encode(r io.Writer, cfg *Config) (err error) {
+	encoder := yaml.NewEncoder(r)
+	defer encoder.Close()
+
+	err = encoder.Encode(cfg)
 	return
 }
 
